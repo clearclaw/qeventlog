@@ -7,3 +7,4 @@ django-model-utils==2.2
 addict
 retryp
 celery
+architect
