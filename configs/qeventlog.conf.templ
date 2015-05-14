@@ -1,0 +1,18 @@
+DATABASES = {
+  "default": {
+     "ENGINE": "django.db.backends.mysql",
+     "NAME": "${DB.QLOG.RW.DATABASE_NAME}",
+     "HOST": "${DB.QLOG.RW.DATABASE_HOST}",
+     "USER": "${DB.QLOG.RW.DATABASE_USER}",
+     "PASSWORD": "${DB.QLOG.RW.DATABASE_PASSWD}",
+     "OPTIONS": {
+     "init_command": "SET storage_engine=INNODB",
+    }
+  }
+}
+DEBUG = ${QLOG.DEBUG}
+ALLOWED_HOSTS = ${QLOG.ALLOWED_HOSTS}
+# http://raven.readthedocs.org/en/latest/config/django.html
+RAVEN_CONFIG = {
+  "dsn": "sync+${SENTRY.DSN}",
+}
