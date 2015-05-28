@@ -2,7 +2,7 @@
 keys = boto, django, django.db.backends, django.request, logtool, requests, root, statsd
 
 [handlers]
-keys = console, syslog
+keys = console, console_colour, syslog
 
 [formatters]
 keys = generic, colour
@@ -76,6 +76,12 @@ class = StreamHandler
 level = DEBUG
 formatter = generic
 args = ()
+
+[handler_console_colour]
+class = rainbow_logging_handler.RainbowLoggingHandler
+stream = sys.stderr
+level = DEBUG
+args = (sys.stderr, "")
 
 [handler_syslog]
 class = handlers.SysLogHandler

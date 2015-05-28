@@ -7,4 +7,7 @@ django-model-utils==2.2
 addict
 retryp
 celery
-architect
+# architect -- pip release has critical bugs 
+# -- https://github.com/maxtepkeev/architect/issues/13
+-e git+https://github.com/maxtepkeev/architect.git#egg=rest-auth
+rainbow_logging_handler

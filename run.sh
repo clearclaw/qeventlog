@@ -1,5 +1,5 @@
 #! /bin/bash
 
 export DJANGO_SETTINGS_MODULE=qeventlog.settings
-qeventlog
+celery -A qeventlog.main worker -Q qeventlog -l debug
 

@@ -9,28 +9,108 @@ import os
 BASE_DIR = os.path.dirname (os.path.dirname (__file__))
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "DisprovedOptimizingConvertibleDehumidifyAllotmentMucilagesSacks"
+SECRET_KEY = "SidewallSleighHoveringEfficientlyInfinitiesReceptiveJudoOuch"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
-TEMPLATE_DEBUG = True
-ALLOWED_HOSTS = []
-APPEND_SLASH = False
 
 # Application definition
 INSTALLED_APPS = (
   "raven.contrib.django.raven_compat",
+  "rest_framework",
+
+  "djcelery",
+
   "qeventlog",
 )
 MIDDLEWARE_CLASSES = ()
 
-# Internationalization
-# https://docs.djangoproject.com/en/1.7/topics/i18n/
-LANGUAGE_CODE = "en-us"
-TIME_ZONE = None
-USE_I18N = False
-USE_L10N = False
-USE_TZ = False
+# It's not always possible to detect connection loss in a timely
+# manner using TCP/IP alone, so AMQP defines something called heartbeats
+# that's is used both by the client and the broker to detect if a
+# connection was closed.
+BROKER_HEARTBEAT = 10
+
+# Maximum number of tasks a pool worker process can execute before
+# it's replaced with a new one. Default is no limit.
+CELERYD_MAX_TASKS_PER_CHILD = 500
+
+# Let"s use SQL for the results?  We need SQL that isn't Django specific.
+# CELERY_RESULT_BACKEND = "db+mysql://task:task@localhost/task"
+# CELERY_RESULT_BACKEND = "djcelery.backends.database:DatabaseBackend"
+
+# django-celery also ships with a scheduler that stores the schedule
+# in the Django database:
+#CELERYBEAT_SCHEDULER = "djcelery.schedulers.DatabaseScheduler"
+
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TASK_SERIALIZER = "json"
+CELERY_ACCEPT_CONTENT = ["json",]  # Ignore other content
+
+# Need to investigate failure handling.
+#def my_on_failure(self, exc, task_id, args, kwargs, einfo):
+#    print("Oh no! Task failed: {0!r}".format(exc))
+#CELERY_ANNOTATIONS = {"*": {"on_failure": my_on_failure}}
+
+# Number of simultaneous jobs to run on the worker
+CELERYD_CONCURRENCY = 1
+
+# Number of jobs for the worker to take off the queue at a time.
+CELERYD_PREFETCH_MULTIPLIER = 1
+
+# If True the task will report its status as "started" when the task
+# is executed by a worker. The default value is False as the normal
+# behaviour is to not report that level of granularity. Tasks are either
+# pending, finished, or waiting to be retried. Having a "started" state
+# can be useful for when there are long running tasks and there is a
+# need to report which task is currently running.
+CELERY_TRACK_STARTED = True
+
+# Late ack means the task messages will be acknowledged after the task
+# has been executed, not just before, which is the default behavior.
+CELERY_ACKS_LATE = True
+
+# Keep results forever
+CELERY_TASK_RESULT_EXPIRES = 0  # Never
+
+# If set to True, result messages will be persistent. This means the
+# messages will not be lost after a broker restart. The default is for
+# the results to be transient.
+# CELERY_RESULT_PERSISTENT = True
+
+# Send events so the worker can be monitored by tools like celerymon.
+CELERY_SEND_EVENTS = True
+
+# If enabled, a task-sent event will be sent for every task so tasks
+# can be tracked before they are consumed by a worker.
+CELERY_SEND_TASK_SENT_EVENT = True
+
+# Enables error emails.
+CELERY_SEND_TASK_ERROR_EMAILS = False
+
+## # This setting can be used to rewrite any task attribute from the
+## # configuration. The setting can be a dict, or a list of annotation
+## # objects that filter for tasks and return a map of attributes to
+## # change.
+##
+## import logging, logtool
+##
+## @logtool.log_call (log_level = logging.ERROR)
+## def mp_on_failure (self, exc, task_id, args, kwargs, einfo):
+##   LOG = logging.getLogger (__name__)
+##   logtool.log_fault (exc)
+##
+## CELERY_ANNOTATIONS = {"*": {"on_failure": mp_on_failure}}
+
+
+CELERY_ROUTES = {
+  "qeventlog.tasks.log": {"exchange": "qeventlog", "routing_key": "qeventlog"}
+}
+
+# https://github.com/ssaw/celery-statsd
+STATSD_HOST = "127.0.0.1"
+STATSD_PORT = 8125
+CELERYD_STATS_PREFIX = "qeventlog."
 
 LOGGING = "/etc/qeventlog/logging.conf"
 LOGGING_CONFIG = "qeventlog.logs.logging_loader"
@@ -43,7 +123,9 @@ DESIRED_VARIABLES = [
 ]
 REQUIRED_VARIABLES = [
   "DATABASES",
+  "DEBUG",
   "RAVEN_CONFIG",
+  "BROKER_URL",
 ]
 
 @logtool.log_call
@@ -56,4 +138,4 @@ if missing:
 missing = check_vars (REQUIRED_VARIABLES, vars ())
 if missing:
   print >> sys.stderr, "Missing required configurations: %s" % missing
-  sys.exit (1)
+  sys.exit ()
