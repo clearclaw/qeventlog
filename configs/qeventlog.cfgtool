@@ -1,2 +1,3 @@
 /etc/qeventlog/logging.conf
 /etc/qeventlog/qeventlog.conf
+/etc/init/qeventlog.conf

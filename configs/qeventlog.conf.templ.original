@@ -1,11 +1,11 @@
-BROKER_URL = "${QLOG.BROKER_URL}"
+BROKER_URL = "${BROKER_URL}"
 DATABASES = {
   "default": {
      "ENGINE": "django.db.backends.mysql",
-     "NAME": "${QLOG.DB.NAME}",
-     "HOST": "${QLOG.DB.HOST}",
-     "USER": "${QLOG.DB.USER}",
-     "PASSWORD": "${QLOG.DB.PASSWD}",
+     "NAME": "${QLOG.DB.DATABASE_NAME}",
+     "HOST": "${QLOG.DB.DATABASE_HOST}",
+     "USER": "${QLOG.DB.DATABASE_USER}",
+     "PASSWORD": "${QLOG.DB.DATABASE_PASSWD}",
      "OPTIONS": {
      "init_command": "SET storage_engine=INNODB",
     }

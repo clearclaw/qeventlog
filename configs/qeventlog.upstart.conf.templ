@@ -1,10 +1,9 @@
-# /etc/init/qeventlog.conf                                            
-                                                                   
-description "qeventlog"                                            
-author "J C Lawrence <jcl@matterport.com>"                         
-                                                                   
-env USER=nobody                                                    
-env GROUP=nogroup                                                  
-                                                                   
-exec celery -A qeventlog.main worker -Q qeventlog -l debug
+# /etc/init/qeventlog.conf
 
+description "qeventlog"
+author "J C Lawrence <claw@kanga.nu>"
+
+env USER=${QLOG.UNIX.USER}
+env GROUP=${QLOG.UNIX.GROUP}
+
+exec celery -A qeventlog.main worker -Q qeventlog -l debug

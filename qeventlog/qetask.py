@@ -146,3 +146,8 @@ def qetask_task_revoked (**kwargs):
     "uuid": kwargs["task_id"],
   })
   send_event (event)
+
+@logtool.log_call
+def qetask_install ():
+  LOG.info ("QETask signal handlers installed.")
+
