@@ -102,7 +102,6 @@ CELERY_SEND_TASK_ERROR_EMAILS = False
 ##
 ## CELERY_ANNOTATIONS = {"*": {"on_failure": mp_on_failure}}
 
-
 CELERY_ROUTES = {
   "qeventlog.tasks.log": {"exchange": "qeventlog", "routing_key": "qeventlog"}
 }
