@@ -3,7 +3,7 @@
 description "qeventlog"
 author "J C Lawrence <claw@kanga.nu>"
 
-env USER=${QLOG.UNIX.USER}
-env GROUP=${QLOG.UNIX.GROUP}
+env USER=${qeventlog_unix_user}
+env GROUP=${qeventlog_unix_group}
 
 exec celery -A qeventlog.main worker -Q qeventlog -l debug

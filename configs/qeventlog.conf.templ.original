@@ -1,4 +1,4 @@
-BROKER_URL = "${qeventlog_broker_url}"
+BROKER_URL = "${QLOG.BROKER_URL}"
 DATABASES = {
   "default": {
      "ENGINE": "django.db.backends.mysql",
