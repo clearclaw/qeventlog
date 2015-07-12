@@ -23,8 +23,8 @@ def get_event (event):
     "timestamp": time.time (),
   }
 
-@signals.before_task_publish.connect
 @logtool.log_call (log_exit = False)
+@signals.before_task_publish.connect
 def qetask_before_task_publish (**kwargs):
   if kwargs["sender"] == "qeventlog.tasks.log":
     return
@@ -42,8 +42,8 @@ def qetask_before_task_publish (**kwargs):
   })
   send_event (event)
 
-@signals.after_task_publish.connect
 @logtool.log_call (log_exit = False)
+@signals.after_task_publish.connect
 def qetask_after_task_publish (**kwargs):
   if kwargs["sender"] == "qeventlog.tasks.log":
     return
@@ -61,8 +61,8 @@ def qetask_after_task_publish (**kwargs):
   })
   send_event (event)
 
-@signals.task_prerun.connect
 @logtool.log_call (log_exit = False)
+@signals.task_prerun.connect
 def qetask_task_prerun (**kwargs):
   if kwargs["sender"] == "qeventlog.tasks.log":
     return
@@ -75,8 +75,8 @@ def qetask_task_prerun (**kwargs):
   })
   send_event (event)
 
-@signals.task_postrun.connect
 @logtool.log_call (log_exit = False)
+@signals.task_postrun.connect
 def qetask_task_postrun (**kwargs):
   if kwargs["sender"] == "qeventlog.tasks.log":
     return
@@ -92,8 +92,8 @@ def qetask_task_postrun (**kwargs):
   })
   send_event (event)
 
-@signals.task_retry.connect
 @logtool.log_call (log_exit = False)
+@signals.task_retry.connect
 def qetask_task_retry (**kwargs):
   if kwargs["sender"] == "qeventlog.tasks.log":
     return
@@ -118,8 +118,8 @@ def qetask_task_retry (**kwargs):
 # def qetask_task_success (**kwargs):
 #  pass
 
-@signals.task_failure.connect
 @logtool.log_call (log_exit = False)
+@signals.task_failure.connect
 def qetask_task_failure (**kwargs):
   if kwargs["sender"] == "qeventlog.tasks.log":
     return
@@ -133,8 +133,8 @@ def qetask_task_failure (**kwargs):
   })
   send_event (event)
 
-@signals.task_revoked.connect
 @logtool.log_call (log_exit = False)
+@signals.task_revoked.connect
 def qetask_task_revoked (**kwargs):
   if kwargs["sender"] == "qeventlog.tasks.log":
     return
