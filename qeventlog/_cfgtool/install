@@ -1,0 +1,5 @@
+#! /bin/sh
+
+install -d -g root -o root -m 0755 -p /etc/qeventlog
+install -D -g root -o root -m 0644 -p -t /etc/qeventlog *.templ
+install -D -g root -o root -m 0644 -p qeventlog.cfgtool /etc/cfgtool/module.d/qeventlog
