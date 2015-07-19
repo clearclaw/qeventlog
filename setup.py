@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import pyver
 
-__version__, __version_info__ = pyver.get_version (pkg = "qeventlog")
+__version__, __version_info__ = pyver.get_version (pkg = "qeventlog", public = True)
 
 setup (
     name = "qeventlog",
