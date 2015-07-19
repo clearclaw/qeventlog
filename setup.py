@@ -21,6 +21,7 @@ setup (
     license = "GPL v3",
     packages = find_packages (exclude = ["tests",]),
     include_package_data = True,
+    package_data = {"": ["_cfgtool/*.templ", "_cfgtool/install"],},
     zip_safe = False,
     install_requires = [line.strip ()
                         for line in file ("requirements.txt").readlines ()],
