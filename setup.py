@@ -22,11 +22,12 @@ setup (
     license = "GPL v3",
     packages = find_packages (exclude = ["tests",]),
     # include_package_data = True,
-    package_data = {"": ["_cfgtool/*.templ", "_cfgtool/install",],
+    package_data = {"qeventlog": ["_cfgtool/*.templ", "_cfgtool/install",],
     },
     data_files = [
-      ("/etc/cfgtool/module.d/", ["qeventlog/_cfgtool/qeventlog.cfgtool",],),
-      ("/etc/qeventlog", ["qeventlog/_cfgtool/*",],),
+      ("", ["LICENSE",]),
+      ("/etc/cfgtool/module.d/", ["qeventlog/_cfgtool/qeventlog.cfgtool",]),
+      ("/etc/qeventlog", ["qeventlog/_cfgtool/*",]),
     ],
     zip_safe = False,
     install_requires = [line.strip ()
