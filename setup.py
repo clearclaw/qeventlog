@@ -18,6 +18,7 @@ setup (
     keywords = "celery event logger",
     author = "J C Lawrence",
     author_email = "claw@kanga.nu",
+    url = "https://github.com/clearclaw/pyver",
     license = "GPL v3",
     packages = find_packages (exclude = ["tests",]),
     include_package_data = True,
@@ -31,4 +32,3 @@ setup (
         ],
     },
 )
-
