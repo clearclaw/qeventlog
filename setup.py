@@ -24,8 +24,8 @@ setup (
     include_package_data = True,
     # package_data = {"": ["_cfgtool/*.templ", "_cfgtool/install"],},
     data_files = [
-      ("/etc/cfgtool/module.d/", ["_cftool/qeventlog.cfgtool,]"),
-      ("/etc/qeventlog", ["_cfgtool/*",]),
+      ("/etc/cfgtool/module.d/", ["_cftool/qeventlog.cfgtool",],),
+      ("/etc/qeventlog", ["_cfgtool/*",],),
     ]
     zip_safe = False,
     install_requires = [line.strip ()
