@@ -29,4 +29,5 @@ setup (
             "qeventlog = qeventlog.main:main",
         ],
     },
-  )
+)
+
