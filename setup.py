@@ -26,7 +26,7 @@ setup (
     data_files = [
       ("/etc/cfgtool/module.d/", ["_cftool/qeventlog.cfgtool",],),
       ("/etc/qeventlog", ["_cfgtool/*",],),
-    ]
+    ],
     zip_safe = False,
     install_requires = [line.strip ()
                         for line in file ("requirements.txt").readlines ()],
