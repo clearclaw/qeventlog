@@ -22,7 +22,9 @@ setup (
     license = "GPL v3",
     packages = find_packages (exclude = ["tests",]),
     # include_package_data = True,
-    package_data = {"qeventlog": ["_cfgtool/*.templ", "_cfgtool/install",],
+    package_data = {"qeventlog": ["_cfgtool/*.templ", 
+                                  "_cfgtool/*.cfgtool",
+                                  "_cfgtool/install",],
     },
     data_files = [
       ("", ["LICENSE",]),
