@@ -4,6 +4,8 @@ anyjson==0.3.3
 architect==0.5.1
 billiard==3.3.0.20
 celery==3.1.18
+cfgtool==0.1.9
+clip.py==0.3.0
 colorama==0.3.3
 configobj==5.0.6
 django-celery==3.1.16
