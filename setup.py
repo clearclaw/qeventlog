@@ -28,6 +28,7 @@ setup (
     data_files = [
       ("/etc/cfgtool/module.d/", ["qeventlog/_cfgtool/qeventlog",]),
       ("/etc/qeventlog", glob.glob ("qeventlog/_cfgtool/*.templ")),
+      ("./bin", ["qeventlog/qeventlog_manage.py"]),
     ],
     zip_safe = False,
     install_requires = [line.strip ()
@@ -35,7 +36,6 @@ setup (
     entry_points = {
         "console_scripts": [
             "qeventlog = qeventlog.main:main",
-            "qeventlog_manage = qeventlog.qeventlog_manage",
         ],
     },
 )
