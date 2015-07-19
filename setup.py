@@ -21,7 +21,6 @@ setup (
     url = "https://github.com/clearclaw/pyver",
     license = "GPL v3",
     packages = find_packages (exclude = ["tests",]),
-    # include_package_data = True,
     package_data = {"qeventlog": ["_cfgtool/qeventlog", 
                                   "_cfgtool/*.templ",
                                   "_cfgtool/install",],
