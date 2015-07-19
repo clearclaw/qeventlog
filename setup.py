@@ -35,6 +35,7 @@ setup (
     entry_points = {
         "console_scripts": [
             "qeventlog = qeventlog.main:main",
+            "qeventlog_manage = qeventlog.qeventlog_manage",
         ],
     },
 )
