@@ -26,7 +26,6 @@ setup (
                                   "_cfgtool/install",],
     },
     data_files = [
-      ("./", ["LICENSE",]),
       ("/etc/cfgtool/module.d/", ["qeventlog/_cfgtool/qeventlog",]),
       ("/etc/qeventlog", glob.glob ("qeventlog/_cfgtool/*.templ")),
     ],
