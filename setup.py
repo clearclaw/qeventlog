@@ -1,5 +1,5 @@
 from setuptools import setup, find_packages
-import pyver
+import glob, pyver
 
 __version__, __version_info__ = pyver.get_version (pkg = "qeventlog", public = True)
 
@@ -26,9 +26,9 @@ setup (
                                   "_cfgtool/install",],
     },
     data_files = [
-      ("", ["LICENSE",]),
+      ("./", ["LICENSE",]),
       ("/etc/cfgtool/module.d/", ["qeventlog/_cfgtool/qeventlog",]),
-      ("/etc/qeventlog", ["qeventlog/_cfgtool/*.templ",]),
+      ("/etc/qeventlog", glob.glob ("qeventlog/_cfgtool/*.templ")),
     ],
     zip_safe = False,
     install_requires = [line.strip ()
