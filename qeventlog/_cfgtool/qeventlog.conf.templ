@@ -1,14 +1,11 @@
 BROKER_URL = "${qeventlog_broker_url}"
 DATABASES = {
   "default": {
-     "ENGINE": "django.db.backends.mysql",
+     "ENGINE": "django.db.backends.postgresql_psycopg2",
      "NAME": "${qeventlog_db_name}",
      "HOST": "${qeventlog_db_host}",
      "USER": "${qeventlog_db_user}",
      "PASSWORD": "${qeventlog_db_passwd}",
-     "OPTIONS": {
-     "init_command": "SET storage_engine=INNODB",
-    }
   }
 }
 # http://raven.readthedocs.org/en/latest/config/django.html

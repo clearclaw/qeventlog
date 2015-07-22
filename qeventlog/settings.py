@@ -17,13 +17,16 @@ DEBUG = False
 # Application definition
 INSTALLED_APPS = (
   "raven.contrib.django.raven_compat",
-  "rest_framework",
 
   "djcelery",
 
   "qeventlog",
 )
 MIDDLEWARE_CLASSES = ()
+
+# Time for Django
+TIME_ZONE = "UTC"
+USE_TZ = False
 
 # It's not always possible to detect connection loss in a timely
 # manner using TCP/IP alone, so AMQP defines something called heartbeats
