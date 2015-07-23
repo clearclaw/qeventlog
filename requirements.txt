@@ -5,7 +5,7 @@ architect==0.5.1
 astroid==1.3.6
 billiard==3.3.0.20
 celery==3.1.18
-cfgtool==0.1.9
+cfgtool==0.1.13
 clip.py==0.3.0
 colorama==0.3.3
 configobj==5.0.6
@@ -17,14 +17,14 @@ kombu==3.0.26
 logilab-common==1.0.2
 logtool==0.2.22
 logutils==0.3.3
-psycopg2
 path.py==7.4
+psycopg2==2.6.1
 pylint==1.4.4
 pytz==2015.4
 pyver==1.0.31
 rainbow-logging-handler==2.2.2
-raven==5.4.4
-retryp==0.1.9
+raven==5.5.0
+retryp==0.1.12
 setuptools-lint==0.3
 six==1.9.0
 termcolor==1.1.0
