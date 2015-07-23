@@ -73,7 +73,7 @@ propagate = 0
 
 [logger_kombu.pidbox]
 level = INFO
-handlers = console_colour
+handlers = ${qeventlog_log_handler}
 qualname = django.db.backends
 propagate = 0
 
