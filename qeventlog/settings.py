@@ -17,9 +17,7 @@ DEBUG = False
 # Application definition
 INSTALLED_APPS = (
   "raven.contrib.django.raven_compat",
-
   "djcelery",
-
   "qeventlog",
 )
 MIDDLEWARE_CLASSES = ()
@@ -56,10 +54,22 @@ CELERY_ACCEPT_CONTENT = ["json",]  # Ignore other content
 #CELERY_ANNOTATIONS = {"*": {"on_failure": my_on_failure}}
 
 # Number of simultaneous jobs to run on the worker
-CELERYD_CONCURRENCY = 1
+# No reason for this to not float.
+# CELERYD_CONCURRENCY = 1
 
 # Number of jobs for the worker to take off the queue at a time.
 CELERYD_PREFETCH_MULTIPLIER = 1
+
+# Task hard time limit in seconds. The worker processing the task will
+# be killed and replaced with a new one when this is exceeded.
+CELERYD_TASK_TIME_LIMIT = 30
+
+# Task soft time limit in seconds.
+# The SoftTimeLimitExceeded exception will be raised when this is
+# exceeded. The task can catch this to e.g. clean up before the hard
+# time limit comes.
+# http://celery.readthedocs.org/en/latest/configuration.html#celeryd-task-soft-time-limit
+CELERYD_TASK_SOFT_TIME_LIMIT = 60
 
 # If True the task will report its status as "started" when the task
 # is executed by a worker. The default value is False as the normal
@@ -74,7 +84,7 @@ CELERY_TRACK_STARTED = True
 CELERY_ACKS_LATE = True
 
 # Keep results forever
-CELERY_TASK_RESULT_EXPIRES = 0  # Never
+# CELERY_TASK_RESULT_EXPIRES = 0  # Never
 
 # If set to True, result messages will be persistent. This means the
 # messages will not be lost after a broker restart. The default is for
@@ -104,6 +114,14 @@ CELERY_SEND_TASK_ERROR_EMAILS = False
 ##   logtool.log_fault (exc)
 ##
 ## CELERY_ANNOTATIONS = {"*": {"on_failure": mp_on_failure}}
+
+# This option enables so that every worker has a dedicated queue, so
+# that tasks can be routed to specific workers.
+CELERY_WORKER_DIRECT = True
+
+# The name of the default queue used by .apply_async if the message
+# has no route or no custom queue has been specified.
+CELERY_DEFAULT_QUEUE = "qeventlog"
 
 CELERY_ROUTES = {
   "qeventlog.tasks.log": {"exchange": "qeventlog", "routing_key": "qeventlog"}
