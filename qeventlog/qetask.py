@@ -150,4 +150,3 @@ def qetask_task_revoked (**kwargs):
 @logtool.log_call
 def qetask_install ():
   LOG.info ("QETask signal handlers installed.")
-

@@ -7,10 +7,10 @@
 addict==0.4.0
 amqp==1.4.6               # via kombu
 anyjson==0.3.3            # via kombu
-architect==0.5.1
+architect==0.5.2
 billiard==3.3.0.20        # via celery
 celery==3.1.18
-cfgtool==0.1.17
+cfgtool==0.1.19
 clip.py==0.3.0            # via cfgtool
 colorama==0.3.3           # via rainbow-logging-handler
 configobj==5.0.6          # via cfgtool
@@ -18,15 +18,14 @@ django-celery==3.1.16
 django-model-utils==2.3.1
 django==1.8.3
 kombu==3.0.26             # via celery
-logtool==0.2.22
+logtool==0.2.25
 logutils==0.3.3           # via rainbow-logging-handler
-path.py==7.4
+path.py==7.5
 psycopg2==2.6.1
 pytz==2015.4              # via celery
-pyver==1.0.31
 rainbow-logging-handler==2.2.2
 raven==5.5.0
-retryp==0.1.12
-six==1.9.0                # via cfgtool, configobj
+retryp==0.1.16
+six==1.9.0                # via configobj
 termcolor==1.1.0          # via cfgtool
-wrapt==1.10.5             # via cfgtool, logtool, retryp
+wrapt==1.10.5             # via logtool, retryp
