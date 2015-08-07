@@ -8,6 +8,7 @@ Django
 logtool
 path.py
 psycopg2
+qlogtask
 rainbow-logging-handler
 raven
 retryp

@@ -1,8 +1,7 @@
 #! /usr/bin/env python
 
-import architect, datetime, logging, logtool, numbers
+import architect, logging, logtool, numbers
 from django.db import models
-from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
 from model_utils.models import TimeStampedModel
 
