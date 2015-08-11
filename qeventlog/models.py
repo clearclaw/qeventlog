@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 import architect, logging, logtool, numbers
-from django.db import models
+from django.db import models, transaction
 from django.core.exceptions import ObjectDoesNotExist
 from model_utils.models import TimeStampedModel
 
@@ -30,29 +30,30 @@ class QEvent (TimeStampedModel):
     """WARNING: Do not call this with payloads of more than 10^3 key
     values, else you are likely to get timeouts.
     """
-    for entity in data:
-      for source in data[entity]:
-        for timestamp in data[entity][source]:
-          for k, v in (data[entity][source][timestamp]).items ():
-            record = {
-              "entity": entity,
-              "source": source,
-              "timestamp": timestamp,
-              "keyname": str (k),
-            }
-            v_name = ("value_num" if isinstance (v, numbers.Number)
-                      else "value_str")
-            val = (v if isinstance (v, numbers.Number)
-                   else str (v)[:DEFAULT_STRLEN])
-            try:
-              obj = QEvent.objects.get (**record) # pylint: disable=E1101
-              record [v_name] = val
-              setattr (obj, v_name, val)
-            except ObjectDoesNotExist:
-              record[v_name] = val
-              obj = QEvent (**record)
-            obj.save ()
-            # LOG.info ("Key values: %s", record)
+    with transaction.atomic ():
+      for entity in data:
+        for source in data[entity]:
+          for timestamp in data[entity][source]:
+            for k, v in (data[entity][source][timestamp]).items ():
+              record = {
+                "entity": entity,
+                "source": source,
+                "timestamp": timestamp,
+                "keyname": str (k),
+              }
+              v_name = ("value_num" if isinstance (v, numbers.Number)
+                        else "value_str")
+              val = (v if isinstance (v, numbers.Number)
+                     else str (v)[:DEFAULT_STRLEN])
+              try:
+                obj = QEvent.objects.get (**record) # pylint: disable=E1101
+                record [v_name] = val
+                setattr (obj, v_name, val)
+              except ObjectDoesNotExist:
+                record[v_name] = val
+                obj = QEvent (**record)
+              obj.save ()
+              # LOG.info ("Key values: %s", record)
 
   class Meta: # pylint: disable=W0232,R0903,C1001
     ordering = ["created",]
