@@ -8,7 +8,7 @@ LOG = logging.getLogger (__name__)
 
 @logtool.log_call
 @current_app.task
-def log (**kwargs):
+def log (date_t, **kwargs):
   try:
     data = {
       kwargs["event"]: {
@@ -17,7 +17,7 @@ def log (**kwargs):
         }
       }
     }
-    QEvent.bulk_import (data)
+    QEvent.bulk_import (date_t, data)
   except Exception as e:
     logtool.log_fault (e)
     raise
