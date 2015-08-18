@@ -1,9 +1,9 @@
 #! /usr/bin/env python
 
-import architect, logging, logtool, numbers
+import architect, datetime, logging, logtool, numbers
 from django.db import models
+from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
-from model_utils.models import TimeStampedModel
 
 LOG = logging.getLogger (__name__)
 DEFAULT_STRLEN = 2048
@@ -11,7 +11,8 @@ DEFAULT_KEYLEN = 64
 
 @architect.install ("partition", type = "range", subtype = "date",
                     constraint = "month", column = "created")
-class QEvent (TimeStampedModel):
+class QEvent (models.Model):
+  created = models.DateTimeField (db_index = True)
   entity = models.CharField (max_length = 64, db_index = True)
   source = models.CharField (max_length = 64, db_index = True)
   timestamp = models.DecimalField (
@@ -26,7 +27,7 @@ class QEvent (TimeStampedModel):
 
   @logtool.log_call
   @classmethod
-  def bulk_import (cls, data):
+  def bulk_import (cls, date_t, data):
     """WARNING: Do not call this with payloads of more than 10^3 key
     values, else you are likely to get timeouts.
     """
@@ -35,6 +36,7 @@ class QEvent (TimeStampedModel):
         for timestamp in data[entity][source]:
           for k, v in (data[entity][source][timestamp]).items ():
             record = {
+              "created": date_t,
               "entity": entity,
               "source": source,
               "timestamp": timestamp,
