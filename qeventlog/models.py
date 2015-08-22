@@ -1,9 +1,7 @@
 #! /usr/bin/env python
 
-import architect, datetime, logging, logtool, numbers
+import architect, logging, logtool, numbers
 from django.db import models
-from django.db import transaction
-from django.core.exceptions import ObjectDoesNotExist
 
 LOG = logging.getLogger (__name__)
 DEFAULT_STRLEN = 2048
@@ -31,6 +29,7 @@ class QEvent (models.Model):
     """WARNING: Do not call this with payloads of more than 10^3 key
     values, else you are likely to get timeouts.
     """
+    dataset = []
     for entity in data:
       for source in data[entity]:
         for timestamp in data[entity][source]:
@@ -46,15 +45,9 @@ class QEvent (models.Model):
                       else "value_str")
             val = (v if isinstance (v, numbers.Number)
                    else str (v)[:DEFAULT_STRLEN])
-            try:
-              obj = QEvent.objects.get (**record) # pylint: disable=E1101
-              record [v_name] = val
-              setattr (obj, v_name, val)
-            except ObjectDoesNotExist:
-              record[v_name] = val
-              obj = QEvent (**record)
-            obj.save ()
-            # LOG.info ("Key values: %s", record)
+            record [v_name] = val
+            dataset.append (QEvent (**record))
+    QEvent.objects.bulk_create (dataset) # pylint: disable = E1101
 
   class Meta: # pylint: disable=W0232,R0903,C1001
     ordering = ["created",]
