@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import logging, logtool, qeventlog.main # pylint disable=W0611
+import logging, logtool, qeventlog.main # pylint disable=unused-import
 from celery import current_app
 from qeventlog.models import QEvent
 
