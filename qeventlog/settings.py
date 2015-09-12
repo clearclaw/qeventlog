@@ -96,7 +96,7 @@ CELERY_ACKS_LATE = True
 
 # If enabled, a task-sent event will be sent for every task so tasks
 # can be tracked before they are consumed by a worker.
-CELERY_SEND_TASK_SENT_EVENT = True
+# CELERY_SEND_TASK_SENT_EVENT = True
 
 # Enables error emails.
 CELERY_SEND_TASK_ERROR_EMAILS = False

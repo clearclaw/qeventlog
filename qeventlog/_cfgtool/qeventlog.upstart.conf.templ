@@ -1,9 +1,12 @@
-# /etc/init/qeventlog.conf
+# /etc/init/qeventlog
 
 description "qeventlog"
 author "J C Lawrence <claw@kanga.nu>"
-
+ 
 env USER=${qeventlog_unix_user}
 env GROUP=${qeventlog_unix_group}
+env PYTHON_HOME=/srv/apps/qeventlog
+ 
+respawn
 
-exec celery -A qeventlog.main worker -Q qeventlog -l debug
+exec $PYTHON_HOME/bin/python $PYTHON_HOME/bin/celery -A qeventlog.main worker -Q qeventlog -l debug -Ofair -c 32
