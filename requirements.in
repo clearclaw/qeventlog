@@ -1,6 +1,7 @@
 addict
 architect
 celery
+celery_statsd
 cfgtool
 django-celery
 django-model-utils
