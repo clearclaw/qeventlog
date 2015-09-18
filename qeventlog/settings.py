@@ -132,6 +132,12 @@ STATSD_HOST = "127.0.0.1"
 STATSD_PORT = 8125
 CELERYD_STATS_PREFIX = "qeventlog."
 
+# How long to wait before trying a job again
+FAIL_WAITTIME = 600
+
+# How many times to retry failed jobs
+FAIL_RETRYCOUNT = 5
+
 LOGGING = "/etc/qeventlog/logging.conf"
 LOGGING_CONFIG = "qeventlog.logs.logging_loader"
 
@@ -142,10 +148,10 @@ DESIRED_VARIABLES = [
   "LOGGING",
 ]
 REQUIRED_VARIABLES = [
+  "BROKER_URL",
   "DATABASES",
   "DEBUG",
   "RAVEN_CONFIG",
-  "BROKER_URL",
 ]
 
 @logtool.log_call
