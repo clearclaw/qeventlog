@@ -8,7 +8,6 @@ from qeventlog.models import QEvent
 
 LOG = logging.getLogger (__name__)
 
-
 @logtool.log_call
 def sentry_exception (e, request, message = None):
   sentry_tags = {"component": "qcameravalues"}
@@ -51,7 +50,7 @@ def retry_handler (task, e):
 
 @logtool.log_call
 @current_app.task (bind = True)
-def log (task, date_t, **kwargs):
+def log (self, date_t, **kwargs):
   try:
     data = {
       kwargs["event"]: {
@@ -62,4 +61,4 @@ def log (task, date_t, **kwargs):
     }
     QEvent.bulk_import (date_t, data)
   except Exception as e:
-    retry_handler (task, e)
+    retry_handler (self, e)
