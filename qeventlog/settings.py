@@ -128,7 +128,7 @@ CELERY_ROUTES = {
 }
 
 # A sequence of modules to import when the worker starts.
-CELERY_IMPORTS = ("celery_statsd")
+CELERY_IMPORTS = ("celery_statsd",)
 
 # https://github.com/ssaw/celery-statsd
 STATSD_HOST = "127.0.0.1"
