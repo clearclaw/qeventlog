@@ -20,15 +20,15 @@ django-model-utils==2.3.1
 django-pgjsonb==0.0.16
 django==1.8.4
 kombu==3.0.26             # via celery
-logtool==0.3.post2
+logtool==0.3.post3
 logutils==0.3.3           # via rainbow-logging-handler
 path.py==8.1.1
 psycopg2==2.6.1
-pytz==2015.4              # via celery
+pytz==2015.6              # via celery
 rainbow-logging-handler==2.2.2
-raven==5.7.1
+raven==5.7.2
 retryp==0.2.post1
 six==1.9.0                # via configobj
-statsd==3.1               # via celery-statsd
+statsd==3.1
 termcolor==1.1.0          # via cfgtool
 wrapt==1.10.5             # via logtool, retryp
