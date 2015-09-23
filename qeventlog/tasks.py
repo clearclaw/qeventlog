@@ -62,3 +62,4 @@ def log (self, date_t, **kwargs):
     QEvent.bulk_import (date_t, data)
   except Exception as e:
     retry_handler (self, e)
+    raise
