@@ -43,6 +43,7 @@ def retry_handler (task, e):
   except: # pylint: disable=W0702
     LOG.error ("Max retries reached: %s  GIVING UP!", task.request.retries)
     sentry_exception (e, task.request)
+    raise
 
 #
 # Tasks
@@ -62,4 +63,3 @@ def log (self, date_t, **kwargs):
     QEvent.bulk_import (date_t, data)
   except Exception as e:
     retry_handler (self, e)
-    raise
