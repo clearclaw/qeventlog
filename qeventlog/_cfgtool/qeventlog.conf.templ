@@ -1,14 +1,14 @@
-BROKER_URL = "${qeventlog_broker_url}"
+BROKER_URL = "${qeventlog.broker_url}"
 DATABASES = {
   "default": {
      "ENGINE": "django.db.backends.postgresql_psycopg2",
-     "NAME": "${qeventlog_db_name}",
-     "HOST": "${qeventlog_db_host}",
-     "USER": "${qeventlog_db_user}",
-     "PASSWORD": "${qeventlog_db_passwd}",
+     "NAME": "${qeventlog.db_name}",
+     "HOST": "${qeventlog.db_host}",
+     "USER": "${qeventlog.db_user}",
+     "PASSWORD": "${qeventlog.db_passwd}",
   }
 }
 # http://raven.readthedocs.org/en/latest/config/django.html
 RAVEN_CONFIG = {
-  "dsn": "sync+${qeventlog_sentry_dsn}",
+  "dsn": "sync+${qeventlog.sentry_dsn}",
 }
