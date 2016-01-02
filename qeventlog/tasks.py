@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
-import logging, logtool, qeventlog.main, raven, sys # pylint disable=unused-import
+import logging, logtool, raven, sys
+import qeventlog.main # pylint: disable=unused-import
 from celery import current_app
 from celery.exceptions import Retry
 from django.conf import settings
-from qeventlog.models import QEvent
+from qeventlog.models import QChildTask, QEvent
 
 LOG = logging.getLogger (__name__)
 
@@ -61,5 +62,10 @@ def log (self, date_t, **kwargs):
       }
     }
     QEvent.bulk_import (date_t, data)
+    if kwargs["event"] == "child_task_create":
+      entry = QChildTask (date_t = date_t,
+                          parent = kwargs.get ("parent_id"),
+                          child = kwargs.get ("child_id"))
+      entry.save ()
   except Exception as e:
     retry_handler (self, e)

@@ -40,3 +40,14 @@ class QEvent (models.Model):
   class Meta: # pylint: disable=W0232,R0903,C1001
     ordering = ["created",]
     index_together = ("entity", "source", "timestamp")
+
+@architect.install ("partition", type = "range", subtype = "date",
+                    constraint = "month", column = "created")
+class QChildTask (models.Model):
+  created = models.DateTimeField (db_index = True)
+  parent = models.CharField (max_length = 64, db_index = True)
+  child = models.CharField (max_length = 64, db_index = True)
+
+  class Meta: # pylint: disable=W0232,R0903,C1001
+    ordering = ["created",]
+    index_together = ("parent", "child")
