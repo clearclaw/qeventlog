@@ -16,7 +16,6 @@ clip.py==0.3.2            # via cfgtool
 colorama==0.3.6           # via rainbow-logging-handler
 configobj==5.0.6          # via cfgtool
 contextlib2==0.5.1        # via raven
-django-celery==3.1.17
 django-model-utils==2.4
 django-pgjsonb==0.0.16
 django==1.9.1

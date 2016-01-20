@@ -3,7 +3,6 @@ architect
 celery
 celery_statsd
 cfgtool
-django-celery
 django-model-utils
 django-pgjsonb
 Django
