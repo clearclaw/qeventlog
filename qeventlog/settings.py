@@ -26,6 +26,9 @@ MIDDLEWARE_CLASSES = ()
 TIME_ZONE = "UTC"
 USE_TZ = False
 
+# Django now insists on this
+ROOT_URLCONF = "qeventlog.urls"
+
 # It's not always possible to detect connection loss in a timely
 # manner using TCP/IP alone, so AMQP defines something called heartbeats
 # that's is used both by the client and the broker to detect if a
