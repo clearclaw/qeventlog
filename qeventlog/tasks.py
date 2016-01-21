@@ -63,7 +63,7 @@ def log (self, date_t, **kwargs):
     }
     QEvent.bulk_import (date_t, data)
     if kwargs["event"] == "after_task_publish" and kwargs.get ("parent_id"):
-      entry = QChildTask (date_t = date_t,
+      entry = QChildTask (created = date_t,
                           parent = kwargs.get ("parent_id"),
                           child = kwargs.get ("uuid"))
       entry.save ()
