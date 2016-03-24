@@ -1,17 +1,17 @@
 #!/usr/bin/env python
 
-import logging, logtool, raven, sys
+import logging, logtool, raven, sys, uuid
 import qeventlog.main # pylint: disable=unused-import
 from celery import current_app
 from celery.exceptions import Retry
 from django.conf import settings
-from qeventlog.models import QChildTask, QEvent
+from qeventlog.models import QChildTask, QEvent, QTaskState
 
 LOG = logging.getLogger (__name__)
 
 @logtool.log_call
 def sentry_exception (e, request, message = None):
-  sentry_tags = {"component": "qcameravalues"}
+  sentry_tags = {"component": "qeventlog"}
   try:
     sentry = raven.Client (settings.RAVEN_CONFIG["dsn"],
                            auto_log_stacks = True)
@@ -54,18 +54,6 @@ def retry_handler (task, e):
 @current_app.task (bind = True)
 def log (self, date_t, **kwargs):
   try:
-    data = {
-      kwargs["event"]: {
-        kwargs["uuid"]: {
-          kwargs["timestamp"]: kwargs
-        }
-      }
-    }
-    QEvent.bulk_import (date_t, data)
-    if kwargs["event"] == "after_task_publish" and kwargs.get ("parent_id"):
-      entry = QChildTask (created = date_t,
-                          parent = kwargs.get ("parent_id"),
-                          child = kwargs.get ("uuid"))
-      entry.save ()
+    QEvent.record (date_t, **kwargs)
   except Exception as e:
     retry_handler (self, e)
