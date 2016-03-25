@@ -1,9 +1,9 @@
 #! /usr/bin/env python
 
 import architect, logging, logtool, uuid
-from django.db import models, transaction
+from django.db import models, transaction, IntegrityError
 from django.contrib.postgres.fields import JSONField
-from django.core.exceptions import ObjectDoesNotExist, IntegrityError
+from django.core.exceptions import ObjectDoesNotExist
 from model_utils import Choices
 from model_utils.fields import StatusField
 
