@@ -1,9 +1,9 @@
 #! /usr/bin/env python
 
-import architect, logging, logtool, retryp, uuid
+import architect, logging, logtool, uuid
 from django.db import models, transaction
 from django.contrib.postgres.fields import JSONField
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, IntegrityError
 from model_utils import Choices
 from model_utils.fields import StatusField
 
@@ -74,27 +74,30 @@ class QTaskState (models.Model):
   retries = models.IntegerField (db_index = True, null = True, blank = True)
   status = StatusField (db_index = True)
 
-  @retryp.retryp (count = DEFAULT_RETRY, expose_last_exc = True)
   @logtool.log_call
   @classmethod
   def record (cls, date_t, **kwargs):
-    try:
-      o = QTaskState.objects.get (task_id = uuid.UUID (kwargs["uuid"]))
-      if ((kwargs["retries"] > o.retries)
-          or (cls._task_states.index (kwargs["event"])
-              > cls._task_states.index (o.status))):
-        o.timestamp = kwargs["timestamp"]
-        o.retries = kwargs["retries"]
-        o.status = kwargs["event"]
-        o.save ()
-    except ObjectDoesNotExist:
-      QTaskState (task_id = uuid.UUID (kwargs["uuid"]),
-                  created = date_t,
-                  timestamp = kwargs["timestamp"],
-                  retries = kwargs.get ("retries", 0),
-                  status = kwargs["event"],
-                ).save ()
-
+    for attempt in xrange (DEFAULT_RETRY):
+      try:
+        o = QTaskState.objects.get (task_id = uuid.UUID (kwargs["uuid"]))
+        if ((kwargs["retries"] > o.retries)
+            or (cls._task_states.index (kwargs["event"])
+                > cls._task_states.index (o.status))):
+          o.timestamp = kwargs["timestamp"]
+          o.retries = kwargs["retries"]
+          o.status = kwargs["event"]
+          o.save ()
+      except ObjectDoesNotExist:
+        QTaskState (task_id = uuid.UUID (kwargs["uuid"]),
+                    created = date_t,
+                    timestamp = kwargs["timestamp"],
+                    retries = kwargs.get ("retries", 0),
+                    status = kwargs["event"],
+                  ).save ()
+      except IntegrityError:
+        if attempt == DEFAULT_RETRY - 1:
+          raise
+        continue
 
   class Meta: # pylint: disable=W0232,R0903,C1001
     ordering = ["created",]
