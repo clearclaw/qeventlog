@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-import architect, logging, logtool, uuid
+import architect, logging, logtool, retryp, uuid
 from django.db import models, transaction
 from django.contrib.postgres.fields import JSONField
 from django.core.exceptions import ObjectDoesNotExist
@@ -8,6 +8,7 @@ from model_utils import Choices
 from model_utils.fields import StatusField
 
 LOG = logging.getLogger (__name__)
+DEFAULT_RETRY = 20
 
 @architect.install ("partition", type = "range", subtype = "date",
                     constraint = "month", column = "created")
@@ -37,26 +38,7 @@ class QEvent (models.Model):
                     timestamp = kwargs["timestamp"],
                     parent = kwargs.get ("parent_id"),
                     child = kwargs.get ("uuid")).save ()
-      try:
-        # Sorted by their expected order of arrival
-        task_states = ["before_task_publish", "after_task_publish",
-                       "task_prerun", "task_retry", "task_postrun",
-                       "task_success", "task_failure", "task_revoked",]
-        o = QTaskState.objects.get (task_id = uuid.UUID (kwargs["uuid"]))
-        if ((kwargs["retries"] > o.retries)
-            or (task_states.index (kwargs["event"])
-                > task_states.index (o.status))):
-          o.timestamp = kwargs["timestamp"]
-          o.retries = kwargs["retries"]
-          o.status = kwargs["event"]
-          o.save ()
-      except ObjectDoesNotExist:
-        QTaskState (task_id = uuid.UUID (kwargs["uuid"]),
-                    created = date_t,
-                    timestamp = kwargs["timestamp"],
-                    retries = kwargs.get ("retries", 0),
-                    status = kwargs["event"],
-                  ).save ()
+      QTaskState.record (date_t, **kwargs)
 
   class Meta: # pylint: disable=W0232,R0903,C1001
     ordering = ["created",]
@@ -91,6 +73,28 @@ class QTaskState (models.Model):
     db_index = True)
   retries = models.IntegerField (db_index = True, null = True, blank = True)
   status = StatusField (db_index = True)
+
+  @retryp.retryp (count = DEFAULT_RETRY, expose_last_exc = True)
+  @logtool.log_call
+  @classmethod
+  def record (cls, date_t, **kwargs):
+    try:
+      o = QTaskState.objects.get (task_id = uuid.UUID (kwargs["uuid"]))
+      if ((kwargs["retries"] > o.retries)
+          or (cls._task_states.index (kwargs["event"])
+              > cls._task_states.index (o.status))):
+        o.timestamp = kwargs["timestamp"]
+        o.retries = kwargs["retries"]
+        o.status = kwargs["event"]
+        o.save ()
+    except ObjectDoesNotExist:
+      QTaskState (task_id = uuid.UUID (kwargs["uuid"]),
+                  created = date_t,
+                  timestamp = kwargs["timestamp"],
+                  retries = kwargs.get ("retries", 0),
+                  status = kwargs["event"],
+                ).save ()
+
 
   class Meta: # pylint: disable=W0232,R0903,C1001
     ordering = ["created",]
