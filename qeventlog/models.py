@@ -37,12 +37,26 @@ class QEvent (models.Model):
                     timestamp = kwargs["timestamp"],
                     parent = kwargs.get ("parent_id"),
                     child = kwargs.get ("uuid")).save ()
-      QTaskState (task_id = uuid.UUID (kwargs["uuid"]),
-                  created = date_t,
-                  timestamp = kwargs["timestamp"],
-                  retries = kwargs.get ("retries", 0),
-                  status = kwargs["event"],
-                ).upsert ()
+      try:
+        # Sorted by their expected order of arrival
+        task_states = ["before_task_publish", "after_task_publish",
+                       "task_prerun", "task_retry", "task_postrun",
+                       "task_success", "task_failure", "task_revoked",]
+        o = QTaskState.objects.get (task_id = uuid.UUID (kwargs["uuid"]))
+        if ((kwargs["retries"] > o.retries)
+            or (task_states.index (kwargs["event"])
+                > task_states.index (o.status))):
+          o.timestamp = kwargs["timestamp"]
+          o.retries = kwargs["retries"]
+          o.status = kwargs["event"]
+          o.save ()
+      except ObjectDoesNotExist:
+        QTaskState (task_id = uuid.UUID (kwargs["uuid"]),
+                    created = date_t,
+                    timestamp = kwargs["timestamp"],
+                    retries = kwargs.get ("retries", 0),
+                    status = kwargs["event"],
+                  ).save ()
 
   class Meta: # pylint: disable=W0232,R0903,C1001
     ordering = ["created",]
@@ -77,27 +91,6 @@ class QTaskState (models.Model):
     db_index = True)
   retries = models.IntegerField (db_index = True, null = True, blank = True)
   status = StatusField (db_index = True)
-
-  @logtool.log_call
-  def upsert (self):
-    with transaction.atomic ():
-      try:
-        o = QTaskState.objects.get (pk = self.task_id)
-        # Is this a newer/fresher event?
-        if ((self.retries > o.retries)
-            or (self._task_states.index (self.status)
-                > self._task_states.index (o.status))):
-          o.timestamp = self.timestamp
-          o.retries = self.retries
-          o.status = self.status
-          o.save ()
-          return
-        # Otherwise this is a stale event -- do nothing
-        pass
-      except ObjectDoesNotExist:
-        self.save ()
-      except Exception as e:
-        raise
 
   class Meta: # pylint: disable=W0232,R0903,C1001
     ordering = ["created",]
