@@ -80,11 +80,11 @@ class QTaskState (models.Model):
     for attempt in xrange (DEFAULT_RETRY):
       try:
         o = QTaskState.objects.get (task_id = uuid.UUID (kwargs["uuid"]))
-        if ((kwargs["retries"] > o.retries)
+        if ((kwargs.get ("retries", 0) > o.retries)
             or (cls._task_states.index (kwargs["event"])
                 > cls._task_states.index (o.status))):
           o.timestamp = kwargs["timestamp"]
-          o.retries = kwargs["retries"]
+          o.retries = kwargs.get ("retries", 0)
           o.status = kwargs["event"]
           o.save ()
       except ObjectDoesNotExist:

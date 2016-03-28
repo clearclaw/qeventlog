@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
+from __future__ import absolute_import
 import logging, logtool, raven, sys
-import qeventlog.main # pylint: disable=unused-import
 from celery import current_app
 from celery.exceptions import Retry
 from django.conf import settings
-from qeventlog.models import QEvent
+import qeventlog.main # pylint: disable=unused-import
+from .models import QEvent
 
 LOG = logging.getLogger (__name__)
 
