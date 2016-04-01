@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-import architect, logging, logtool, uuid
+import architect, logging, logtool, retryp, uuid
 from django.db import models, transaction
 from django.contrib.postgres.fields import JSONField
 from model_utils import Choices
@@ -73,6 +73,7 @@ class QTaskState (models.Model):
   retries = models.IntegerField (db_index = True, null = True, blank = True)
   status = StatusField (db_index = True)
 
+  @retryp.retryp (count = 5, delay = 0, expose_last_exc = True)
   @logtool.log_call
   @classmethod
   def record (cls, date_t, **kwargs):
