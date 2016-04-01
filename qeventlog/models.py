@@ -66,7 +66,7 @@ class QTaskState (models.Model):
                   "task_success", "task_failure", "task_revoked",]
   STATUS = Choices (*_task_states)
   task_id = models.UUIDField (db_index = True, primary_key = True)
-  created = models.DateTimeField (db_index = True)
+  created = models.DateTimeField (db_index = True, null = True)
   timestamp = models.DecimalField (
     max_digits = 30, decimal_places = 6, null = True, blank = True,
     db_index = True)
