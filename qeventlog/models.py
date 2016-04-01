@@ -79,10 +79,10 @@ class QTaskState (models.Model):
     o, created = QTaskState.objects.get_or_create (
       task_id = uuid.UUID (kwargs["uuid"]),
       defaults = {
-        o.created: date_t,
-        o.timestamp: kwargs["timestamp"],
-        o.retries: kwargs.get ("retries", 0),
-        o.status: kwargs["event"],
+        created: date_t,
+        timestamp: kwargs["timestamp"],
+        retries: kwargs.get ("retries", 0),
+        status: kwargs["event"],
       })
     if created or ((kwargs.get ("retries", 0) > o.retries)
                    or (cls._task_states.index (kwargs["event"])
