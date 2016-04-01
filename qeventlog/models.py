@@ -22,6 +22,7 @@ class QEvent (models.Model):
 
   # Because there's not a clear way to have pre and post-save hooks on
   # save() execute in the same transaction.
+  @retryp.retryp (count = 5, delay = 0, expose_last_exc = True)
   @logtool.log_call
   @classmethod
   def record (cls, date_t, **kwargs):
@@ -73,7 +74,6 @@ class QTaskState (models.Model):
   retries = models.IntegerField (db_index = True, null = True, blank = True)
   status = StatusField (db_index = True)
 
-  @retryp.retryp (count = 5, delay = 0, expose_last_exc = True)
   @logtool.log_call
   @classmethod
   def record (cls, date_t, **kwargs):
