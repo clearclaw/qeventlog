@@ -66,7 +66,7 @@ class QTaskState (models.Model):
                   "task_success", "task_failure", "task_revoked",]
   STATUS = Choices (*_task_states)
   task_id = models.UUIDField (db_index = True, primary_key = True)
-  created = models.DateTimeField (db_index = True, null = True)
+  created = models.DateTimeField (db_index = True)
   timestamp = models.DecimalField (
     max_digits = 30, decimal_places = 6, null = True, blank = True,
     db_index = True)
@@ -77,12 +77,16 @@ class QTaskState (models.Model):
   @classmethod
   def record (cls, date_t, **kwargs):
     o, created = QTaskState.objects.get_or_create (
-      task_id = uuid.UUID (kwargs["uuid"]))
+      task_id = uuid.UUID (kwargs["uuid"]),
+      defaults = {
+        o.created: date_t,
+        o.timestamp: kwargs["timestamp"],
+        o.retries: kwargs.get ("retries", 0),
+        o.status: kwargs["event"],
+      })
     if created or ((kwargs.get ("retries", 0) > o.retries)
                    or (cls._task_states.index (kwargs["event"])
                        > cls._task_states.index (o.status))):
-      if created:
-        o.created = date_t
       o.timestamp = kwargs["timestamp"]
       o.retries = kwargs.get ("retries", 0)
       o.status = kwargs["event"]
