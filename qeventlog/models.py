@@ -1,9 +1,8 @@
 #! /usr/bin/env python
 
 import architect, logging, logtool, uuid
-from django.db import models, transaction, IntegrityError
+from django.db import models, transaction
 from django.contrib.postgres.fields import JSONField
-from django.core.exceptions import ObjectDoesNotExist
 from model_utils import Choices
 from model_utils.fields import StatusField
 
@@ -77,27 +76,17 @@ class QTaskState (models.Model):
   @logtool.log_call
   @classmethod
   def record (cls, date_t, **kwargs):
-    for attempt in xrange (DEFAULT_RETRY):
-      try:
-        o = QTaskState.objects.get (task_id = uuid.UUID (kwargs["uuid"]))
-        if ((kwargs.get ("retries", 0) > o.retries)
-            or (cls._task_states.index (kwargs["event"])
-                > cls._task_states.index (o.status))):
-          o.timestamp = kwargs["timestamp"]
-          o.retries = kwargs.get ("retries", 0)
-          o.status = kwargs["event"]
-          o.save ()
-      except ObjectDoesNotExist:
-        QTaskState (task_id = uuid.UUID (kwargs["uuid"]),
-                    created = date_t,
-                    timestamp = kwargs["timestamp"],
-                    retries = kwargs.get ("retries", 0),
-                    status = kwargs["event"],
-                  ).save ()
-      except IntegrityError:
-        if attempt == DEFAULT_RETRY - 1:
-          raise
-        continue
+    o, created = QTaskState.objects.get_or_create (
+      task_id = uuid.UUID (kwargs["uuid"]))
+    if created or ((kwargs.get ("retries", 0) > o.retries)
+                   or (cls._task_states.index (kwargs["event"])
+                       > cls._task_states.index (o.status))):
+      if created:
+        o.created = date_t
+      o.timestamp = kwargs["timestamp"]
+      o.retries = kwargs.get ("retries", 0)
+      o.status = kwargs["event"]
+      o.save ()
 
   class Meta: # pylint: disable=W0232,R0903,C1001
     ordering = ["created",]
