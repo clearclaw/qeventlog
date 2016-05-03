@@ -80,7 +80,7 @@ class QTaskState (models.Model):
   timestamp = models.DecimalField (
     max_digits = 30, decimal_places = 6, null = True, blank = True,
     db_index = True)
-  task = models.ForeignKey (QTaskName)
+  name = models.ForeignKey (QTaskName)
   retries = models.IntegerField (db_index = True, null = True, blank = True)
   status = StatusField (db_index = True)
 
@@ -95,7 +95,7 @@ class QTaskState (models.Model):
       defaults = {
         "created": now,
         "timestamp": kwargs["timestamp"],
-        "task": name,
+        "name": name,
         "retries": kwargs.get ("retries", 0),
         "status": kwargs["event"],
       })
