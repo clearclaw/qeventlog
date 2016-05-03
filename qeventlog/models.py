@@ -8,6 +8,7 @@ from model_utils.fields import StatusField
 
 LOG = logging.getLogger (__name__)
 DEFAULT_RETRY = 20
+TASKNAME_LEN = 128
 
 @architect.install ("partition", type = "range", subtype = "date",
                     constraint = "month", column = "created")
@@ -41,7 +42,7 @@ class QEvent (models.Model):
                     child = kwargs.get ("uuid")).save ()
       QTaskState.record (now, **kwargs)
 
-  class Meta: # pylint: disable=W0232,R0903,C1001
+  class Meta: # pylint: disable=no-init,too-few-public-methods,old-style-class
     ordering = ["created",]
     index_together = ("event", "task_id", "timestamp")
 
@@ -55,9 +56,16 @@ class QChildTask (models.Model):
   parent = models.UUIDField (db_index = True)
   child = models.UUIDField (db_index = True)
 
-  class Meta: # pylint: disable=W0232,R0903,C1001
+  class Meta: # pylint: disable=no-init,too-few-public-methods,old-style-class
     ordering = ["created", "timestamp"]
     index_together = ("parent", "child")
+
+class QTaskName (models.Model):
+  name = models.CharField (unique = True, max_length = TASKNAME_LEN,
+                           db_index = True)
+
+  class Meta: # pylint: disable=no-init,too-few-public-methods,old-style-class
+    ordering = ["name",]
 
 @architect.install ("partition", type = "range", subtype = "date",
                     constraint = "month", column = "created")
@@ -72,20 +80,22 @@ class QTaskState (models.Model):
   timestamp = models.DecimalField (
     max_digits = 30, decimal_places = 6, null = True, blank = True,
     db_index = True)
-  task = models.CharField (max_length = 64, null = True, blank = True,
-                           db_index = True)
+  task = models.ForeignKey (QTaskName)
   retries = models.IntegerField (db_index = True, null = True, blank = True)
   status = StatusField (db_index = True)
 
   @logtool.log_call
   @classmethod
   def record (cls, now, **kwargs):
-    o, created = QTaskState.objects.get_or_create (
+    name, created = ( # pylint: disable=W0612
+            QTaskName.objects.get_or_create ( # pylint: disable=no-member
+            name = kwargs["task"]))
+    o, created = QTaskState.objects.get_or_create ( # pylint: disable=no-member
       task_id = uuid.UUID (kwargs["uuid"]),
       defaults = {
         "created": now,
         "timestamp": kwargs["timestamp"],
-        "task": kwargs["task"],
+        "task": name,
         "retries": kwargs.get ("retries", 0),
         "status": kwargs["event"],
       })
@@ -97,6 +107,6 @@ class QTaskState (models.Model):
       o.status = kwargs["event"]
       o.save ()
 
-  class Meta: # pylint: disable=W0232,R0903,C1001
+  class Meta: # pylint: disable=no-init,too-few-public-methods,old-style-class
     ordering = ["created",]
     index_together = ("created", "timestamp", "status")
