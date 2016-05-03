@@ -8,15 +8,27 @@ from django.conf import settings
 import qeventlog.main # pylint: disable=unused-import
 from .models import QEvent
 
+from ._version import get_versions
+__version__ = get_versions ()['version']
+__version_info__ = get_versions ()
+del get_versions
+
 LOG = logging.getLogger (__name__)
 
 @logtool.log_call
 def sentry_exception (e, request, message = None):
-  sentry_tags = {"component": "qeventlog"}
+  """Yes, this eats exceptions"""
   try:
-    sentry = raven.Client (settings.RAVEN_CONFIG["dsn"],
-                           auto_log_stacks = True)
-    logtool.log_fault (e, message = message)
+    app_name = "qeventlog"
+    app_ver = __version__
+    sentry_dsn = settings.RAVEN_CONFIG["dsn"]
+    sentry_tags = {"component": app_name,
+                   "version": app_ver,}
+    sentry = raven.Client (sentry_dsn,
+                           auto_log_stacks = True,
+                           release = "%s: %s" % (app_name, app_ver),
+                           transport = raven.transport.http.HTTPTransport)
+    logtool.log_fault (e, message = message, level = logging.INFO)
     data = {
       "job": request,
     }
@@ -31,7 +43,8 @@ def sentry_exception (e, request, message = None):
       rc = sentry.capture (**sentry_tags)
     LOG.error ("Sentry filed: %s", rc)
   except Exception as ee:
-    logtool.log_fault (ee, message = "FAULT: Problem logging exception.")
+    logtool.log_fault (ee, message = "FAULT: Problem logging exception.",
+                       level = logging.INFO)
 
 @logtool.log_call
 def retry_handler (task, e):
@@ -53,8 +66,8 @@ def retry_handler (task, e):
 
 @logtool.log_call
 @current_app.task (bind = True)
-def log (self, date_t, **kwargs):
+def log (self, time_t, *args, **kwargs): # pylint: disable=unused-argument
   try:
-    QEvent.record (date_t, **kwargs)
+    QEvent.record (time_t, **kwargs)
   except Exception as e:
     retry_handler (self, e)

@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-import architect, logging, logtool, retryp, uuid
+import architect, datetime, logging, logtool, retryp, uuid
 from django.db import models, transaction
 from django.contrib.postgres.fields import JSONField
 from model_utils import Choices
@@ -25,20 +25,21 @@ class QEvent (models.Model):
   @retryp.retryp (count = 5, delay = 0, expose_last_exc = True)
   @logtool.log_call
   @classmethod
-  def record (cls, date_t, **kwargs):
+  def record (cls, time_t, **kwargs): # pylint: disable=unused-argument
     with transaction.atomic ():
-      QEvent (created = date_t,
-              timestamp = kwargs["timestamp"],
+      now = datetime.datetime.utcnow ()
+      QEvent (created = now,
+              timestamp = time_t,
               event = kwargs["event"],
               task_id = kwargs["uuid"],
               data = kwargs,
             ).save ()
       if kwargs["event"] == "after_task_publish" and kwargs.get ("parent_id"):
-        QChildTask (created = date_t,
+        QChildTask (created = now,
                     timestamp = kwargs["timestamp"],
                     parent = kwargs.get ("parent_id"),
                     child = kwargs.get ("uuid")).save ()
-      QTaskState.record (date_t, **kwargs)
+      QTaskState.record (now, **kwargs)
 
   class Meta: # pylint: disable=W0232,R0903,C1001
     ordering = ["created",]
@@ -71,17 +72,20 @@ class QTaskState (models.Model):
   timestamp = models.DecimalField (
     max_digits = 30, decimal_places = 6, null = True, blank = True,
     db_index = True)
+  task = models.CharField (max_length = 64, null = True, blank = True,
+                           db_index = True)
   retries = models.IntegerField (db_index = True, null = True, blank = True)
   status = StatusField (db_index = True)
 
   @logtool.log_call
   @classmethod
-  def record (cls, date_t, **kwargs):
+  def record (cls, now, **kwargs):
     o, created = QTaskState.objects.get_or_create (
       task_id = uuid.UUID (kwargs["uuid"]),
       defaults = {
-        "created": date_t,
+        "created": now,
         "timestamp": kwargs["timestamp"],
+        "task": kwargs["task"],
         "retries": kwargs.get ("retries", 0),
         "status": kwargs["event"],
       })
