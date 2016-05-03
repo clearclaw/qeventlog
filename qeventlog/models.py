@@ -61,8 +61,8 @@ class QChildTask (models.Model):
     index_together = ("parent", "child")
 
 class QTaskName (models.Model):
-  name = models.CharField (unique = True, max_length = TASKNAME_LEN,
-                           db_index = True)
+  name = models.CharField (unique = True, null = True, blank = True,
+                           max_length = TASKNAME_LEN, db_index = True)
 
   class Meta: # pylint: disable=no-init,too-few-public-methods,old-style-class
     ordering = ["name",]
