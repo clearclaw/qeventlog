@@ -7,6 +7,7 @@ from celery.exceptions import Retry
 from django.conf import settings
 import qeventlog.main # pylint: disable=unused-import
 from .models import QEvent
+from .qetask import QETask
 
 from ._version import get_versions
 __version__ = get_versions ()['version']
@@ -65,7 +66,7 @@ def retry_handler (task, e):
 #
 
 @logtool.log_call
-@current_app.task (bind = True)
+@current_app.task (bind = True, base = QETask)
 def log (self, time_t, *args, **kwargs): # pylint: disable=unused-argument
   try:
     QEvent.record (time_t, **kwargs)

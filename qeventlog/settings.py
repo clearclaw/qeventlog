@@ -64,14 +64,14 @@ CELERYD_PREFETCH_MULTIPLIER = 1
 
 # Task hard time limit in seconds. The worker processing the task will
 # be killed and replaced with a new one when this is exceeded.
-CELERYD_TASK_TIME_LIMIT = 30
+CELERYD_TASK_TIME_LIMIT = 600
 
 # Task soft time limit in seconds.
 # The SoftTimeLimitExceeded exception will be raised when this is
 # exceeded. The task can catch this to e.g. clean up before the hard
 # time limit comes.
 # http://celery.readthedocs.org/en/latest/configuration.html#celeryd-task-soft-time-limit
-CELERYD_TASK_SOFT_TIME_LIMIT = 60
+CELERYD_TASK_SOFT_TIME_LIMIT = 180
 
 # If True the task will report its status as "started" when the task
 # is executed by a worker. The default value is False as the normal
