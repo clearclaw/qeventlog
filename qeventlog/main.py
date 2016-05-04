@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-import logging, logging.config, os, raven, raven.contrib
+import logging, logging.config, os, raven, raven.contrib.celery
 from celery import Celery
 from celery.signals import setup_logging
 from django.conf import settings
