@@ -6,12 +6,12 @@ from celery import current_app
 from celery.exceptions import Retry
 from django.conf import settings
 import qeventlog.main # pylint: disable=unused-import
+from .main import SENTRY
 from .models import QEvent
 from .qetask import QETask
 
 from ._version import get_versions
 __version__ = get_versions ()['version']
-__version_info__ = get_versions ()
 del get_versions
 
 LOG = logging.getLogger (__name__)
@@ -20,28 +20,19 @@ LOG = logging.getLogger (__name__)
 def sentry_exception (e, request, message = None):
   """Yes, this eats exceptions"""
   try:
-    app_name = "qeventlog"
-    app_ver = __version__
-    sentry_dsn = settings.RAVEN_CONFIG["dsn"]
-    sentry_tags = {"component": app_name,
-                   "version": app_ver,}
-    sentry = raven.Client (sentry_dsn,
-                           auto_log_stacks = True,
-                           release = "%s: %s" % (app_name, app_ver),
-                           transport = raven.transport.http.HTTPTransport)
     logtool.log_fault (e, message = message, level = logging.INFO)
     data = {
       "job": request,
     }
     if message:
       data["message"] = message
-    sentry.extra_context (data)
+    SENTRY.extra_context (data)
     if e is not None:
       einfo = sys.exc_info ()
-      rc = sentry.captureException (einfo, **sentry_tags)
+      rc = SENTRY.captureException (einfo, **sentry_tags)
       del einfo
     else:
-      rc = sentry.capture (**sentry_tags)
+      rc = SENTRY.capture (**sentry_tags)
     LOG.error ("Sentry filed: %s", rc)
   except Exception as ee:
     logtool.log_fault (ee, message = "FAULT: Problem logging exception.",
