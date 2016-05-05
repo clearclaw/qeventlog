@@ -138,10 +138,10 @@ STATSD_PORT = 8125
 CELERYD_STATS_PREFIX = "qeventlog."
 
 # How long to wait before trying a job again
-FAIL_WAITTIME = 600
+FAIL_WAITTIME = 60
 
 # How many times to retry failed jobs
-FAIL_RETRYCOUNT = 5
+FAIL_RETRYCOUNT = 10
 
 LOGGING = "/etc/qeventlog/logging.conf"
 LOGGING_CONFIG = "qeventlog.logs.logging_loader"
