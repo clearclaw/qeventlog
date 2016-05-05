@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import absolute_import
-import logging, logtool, raven, sys
+import logging, logtool, sys
 from celery import current_app
 from celery.exceptions import Retry
 from django.conf import settings
@@ -27,12 +27,9 @@ def sentry_exception (e, request, message = None):
     if message:
       data["message"] = message
     SENTRY.extra_context (data)
-    if e is not None:
-      einfo = sys.exc_info ()
-      rc = SENTRY.captureException (einfo, **sentry_tags)
-      del einfo
-    else:
-      rc = SENTRY.capture (**sentry_tags)
+    einfo = sys.exc_info ()
+    rc = SENTRY.captureException (einfo)
+    del einfo
     LOG.error ("Sentry filed: %s", rc)
   except Exception as ee:
     logtool.log_fault (ee, message = "FAULT: Problem logging exception.",
@@ -60,6 +57,8 @@ def retry_handler (task, e):
 @current_app.task (bind = True, base = QETask)
 def log (self, time_t, *args, **kwargs): # pylint: disable=unused-argument
   try:
+    LOG.info ("Received: %s for task: %s",
+              kwargs.get ("event"), kwargs.get("task_id"))
     QEvent.record (time_t, **kwargs)
   except Exception as e:
     retry_handler (self, e)

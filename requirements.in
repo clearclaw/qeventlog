@@ -10,5 +10,4 @@ path.py
 psycopg2
 rainbow-logging-handler
 raven
-retryp
 statsd
