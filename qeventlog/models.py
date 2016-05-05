@@ -37,7 +37,7 @@ class QEvent (models.Model):
         QChildTask (created = now,
                     timestamp = kwargs["timestamp"],
                     parent = kwargs.get ("parent_id"),
-                    child = kwargs.get ("uuid")).save ()
+                    child = kwargs.get ("task_id")).save ()
       QTaskState.record (now, **kwargs)
 
   class Meta: # pylint: disable=no-init,too-few-public-methods,old-style-class
@@ -89,7 +89,7 @@ class QTaskState (models.Model):
             QTaskName.objects.get_or_create ( # pylint: disable=no-member
             name = kwargs["task"]))
     o, created = QTaskState.objects.get_or_create ( # pylint: disable=no-member
-      task_id = uuid.UUID (kwargs["uuid"]),
+      task_id = uuid.UUID (kwargs["task_id"]),
       defaults = {
         "created": now,
         "timestamp": kwargs["timestamp"],
