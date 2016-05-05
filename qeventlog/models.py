@@ -30,7 +30,7 @@ class QEvent (models.Model):
       QEvent (created = now,
               timestamp = time_t,
               event = kwargs["event"],
-              task_id = kwargs["uuid"],
+              task_id = kwargs["task_id"],
               data = kwargs,
             ).save ()
       if kwargs["event"] == "after_task_publish" and kwargs.get ("parent_id"):
