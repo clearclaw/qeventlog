@@ -26,8 +26,8 @@ path.py==8.2.1
 psycopg2==2.6.1
 pytz==2016.4              # via celery
 rainbow-logging-handler==2.2.2
-raven==5.14.0
-retryp==0.3.post8
+raven==5.15.0
+retryp==0.3.post9
 six==1.10.0               # via cfgtool, configobj, logtool
 statsd==3.2.1
 temporary==1.0.0          # via cfgtool

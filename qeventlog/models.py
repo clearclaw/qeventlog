@@ -21,26 +21,22 @@ class QEvent (models.Model):
   task_id = models.UUIDField (db_index = True)
   data = JSONField (db_index = True, null = True, blank = True)
 
-  # Because there's not a clear way to have pre and post-save hooks on
-  # save() execute in the same transaction.
-  @retryp.retryp (count = 5, delay = 0, expose_last_exc = True)
   @logtool.log_call
   @classmethod
   def record (cls, time_t, **kwargs): # pylint: disable=unused-argument
-    with transaction.atomic ():
-      now = datetime.datetime.utcnow ()
-      QEvent (created = now,
-              timestamp = time_t,
-              event = kwargs["event"],
-              task_id = kwargs["uuid"],
-              data = kwargs,
-            ).save ()
-      if kwargs["event"] == "after_task_publish" and kwargs.get ("parent_id"):
-        QChildTask (created = now,
-                    timestamp = kwargs["timestamp"],
-                    parent = kwargs.get ("parent_id"),
-                    child = kwargs.get ("uuid")).save ()
-      QTaskState.record (now, **kwargs)
+    now = datetime.datetime.utcnow ()
+    QEvent (created = now,
+            timestamp = time_t,
+            event = kwargs["event"],
+            task_id = kwargs["uuid"],
+            data = kwargs,
+          ).save ()
+    if kwargs["event"] == "after_task_publish" and kwargs.get ("parent_id"):
+      QChildTask (created = now,
+                  timestamp = kwargs["timestamp"],
+                  parent = kwargs.get ("parent_id"),
+                  child = kwargs.get ("uuid")).save ()
+    QTaskState.record (now, **kwargs)
 
   class Meta: # pylint: disable=no-init,too-few-public-methods,old-style-class
     ordering = ["created",]
@@ -84,28 +80,30 @@ class QTaskState (models.Model):
   retries = models.IntegerField (db_index = True, null = True, blank = True)
   status = StatusField (db_index = True)
 
+  @retryp.retryp (count = 5, delay = 3, expose_last_exc = True)
   @logtool.log_call
   @classmethod
   def record (cls, now, **kwargs):
-    name, created = ( # pylint: disable=W0612
-            QTaskName.objects.get_or_create ( # pylint: disable=no-member
-            name = kwargs["task"]))
-    o, created = QTaskState.objects.get_or_create ( # pylint: disable=no-member
-      task_id = uuid.UUID (kwargs["uuid"]),
-      defaults = {
-        "created": now,
-        "timestamp": kwargs["timestamp"],
-        "name": name,
-        "retries": kwargs.get ("retries", 0),
-        "status": kwargs["event"],
-      })
-    if created or ((kwargs.get ("retries", 0) > o.retries)
-                   or (cls._task_states.index (kwargs["event"])
-                       > cls._task_states.index (o.status))):
-      o.timestamp = kwargs["timestamp"]
-      o.retries = kwargs.get ("retries", 0)
-      o.status = kwargs["event"]
-      o.save ()
+    with transaction.atomic ():
+      name, created = ( # pylint: disable=W0612
+              QTaskName.objects.get_or_create ( # pylint: disable=no-member
+              name = kwargs["task"]))
+      o, created = QTaskState.objects.get_or_create ( # pylint: disable=no-member
+        task_id = uuid.UUID (kwargs["uuid"]),
+        defaults = {
+          "created": now,
+          "timestamp": kwargs["timestamp"],
+          "name": name,
+          "retries": kwargs.get ("retries", 0),
+          "status": kwargs["event"],
+        })
+      if created or ((kwargs.get ("retries", 0) > o.retries)
+                     or (cls._task_states.index (kwargs["event"])
+                         > cls._task_states.index (o.status))):
+        o.timestamp = kwargs["timestamp"]
+        o.retries = kwargs.get ("retries", 0)
+        o.status = kwargs["event"]
+        o.save ()
 
   class Meta: # pylint: disable=no-init,too-few-public-methods,old-style-class
     ordering = ["created",]
