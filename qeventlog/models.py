@@ -61,7 +61,7 @@ class QEvent (models.Model):
               timestamp = time_t,
               event = kwargs["event"],
               retry = kwargs.get ("retries", 0), # FIXME: Can't rely on this?
-              event_index = self._task_states.index (kwargs["event"]),
+              event_index = cls._task_states.index (kwargs["event"]),
               task_id = kwargs["task_id"],
               data = kwargs,
               type = name,
