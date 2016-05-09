@@ -5,7 +5,6 @@ from django.db import models, transaction
 from django.contrib.postgres.fields import JSONField
 
 LOG = logging.getLogger (__name__)
-DEFAULT_RETRY = 20
 TASKNAME_LEN = 128
 
 class QTaskType (models.Model):
@@ -15,14 +14,37 @@ class QTaskType (models.Model):
   class Meta: # pylint: disable=no-init,too-few-public-methods,old-style-class
     ordering = ["type",]
 
+# Yeah, the indexes are going to lean and horribly.
 @architect.install ("partition", type = "range", subtype = "date",
                     constraint = "month", column = "created")
 class QEvent (models.Model):
+  # This is the order in which status events are issued for a task,
+  # and ised used to provide a sorting index for task histories so as
+  # to determine the current final state of the task.  Note that
+  # task_postun is actually issued last in reality, but it is placed
+  # before all the actual terminal task status events which are issued
+  # immediately before that so that they instead can be tracked as the
+  # "final status" of the task.  A small lie, but a convenient one.
+  #
+  # task_abandoned -- which is not actually a Celerey signal event --
+  # is present as an ultimate state so that failed tasks which a human
+  # has determined are irrecoverable and forged an event to that
+  # effect need not clutter dashboards and reports.
+  _task_states = ["before_task_publish", "after_task_publish",
+                  "task_prerun", "task_retry", "task_postrun",
+                  "task_success", "task_failure", "task_revoked",
+                  "task_abandoned", # Used when humans give up.  MUST
+                                    # BE LAST!
+  ]
   created = models.DateTimeField (db_index = True)
   timestamp = models.DecimalField (
     max_digits = 30, decimal_places = 6, null = True, blank = True,
     db_index = True)
   event = models.CharField (max_length = 64, db_index = True)
+  retry = models.SmallIntegerField (db_index = True,
+                                    null = True, blank = True)
+  event_index = models.SmallIntegerField (db_index = True,
+                                          null = True, blank = True,)
   task_id = models.UUIDField (db_index = True)
   type = models.ForeignKey (QTaskType)
   data = JSONField (db_index = True, null = True, blank = True)
@@ -38,6 +60,8 @@ class QEvent (models.Model):
       QEvent (created = now,
               timestamp = time_t,
               event = kwargs["event"],
+              retry = kwargs.get ("retries", 0), # FIXME: Can't rely on this?
+              event_index = self._task_states.index (kwargs["event"]),
               task_id = kwargs["task_id"],
               data = kwargs,
               type = name,
