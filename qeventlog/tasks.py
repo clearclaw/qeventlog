@@ -22,7 +22,35 @@ def sentry_exception (e, request, message = None):
   try:
     logtool.log_fault (e, message = message, level = logging.INFO)
     data = {
-      "job": request,
+      "task": task,
+      "request": {
+        "args": task.request.args,
+        "callbacks": task.request.callbacks,
+        "called_directly": task.request.called_directly,
+        "chain": task.request.chain,
+        "chord": task.request.chord,
+        "correlation_id": task.request.correlation_id,
+        "delivery_info": task.request.delivery_info,
+        "errbacks": task.request.errbacks,
+        "eta": task.request.eta,
+        "expires": task.request.expires,
+        "group": task.request.group,
+        "group": task.request.group,
+        "headers": task.request.headers,
+        "hostname": task.request.hostname,
+        "id": task.request.id,
+        "is_eager": task.request.is_eager,
+        "kwargs": task.request.kwargs,
+        "origin": task.request.origin,
+        "parent_id": task.request.parent_id,
+        "reply_to": task.request.reply_to,
+        "retries": task.request.retries,
+        "root_id": task.request.root_id,
+        "task": task.request.task,
+        "taskset": task.request.taskset,
+        "timelimit": task.request.timelimit,
+        "utc": task.request.utc,
+      },
     }
     if message:
       data["message"] = message
