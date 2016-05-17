@@ -2,7 +2,8 @@
 
 import architect, datetime, logging, logtool
 from django.db import models, transaction
-from django.contrib.postgres.fields import JSONField
+#from django.contrib.postgres.fields import JSONField
+from django_pgjsonb import JSONField
 
 LOG = logging.getLogger (__name__)
 TASKNAME_LEN = 128

@@ -18,17 +18,19 @@ colorama==0.3.7           # via rainbow-logging-handler
 configobj==5.0.6          # via cfgtool
 contextlib2==0.5.3        # via raven, temporary
 django-model-utils==2.5
+django-pgjsonb==0.0.22
 django==1.9.6
 kombu==3.0.35             # via celery
 logtool==0.3.post16
 logutils==0.3.3           # via rainbow-logging-handler
 path.py==8.2.1
+pathlib2==2.1.0           # via temporary
 psycopg2==2.6.1
 pytz==2016.4              # via celery
 rainbow-logging-handler==2.2.2
-raven==5.16.0
-six==1.10.0               # via cfgtool, configobj, logtool
+raven==5.17.0
+six==1.10.0               # via cfgtool, configobj, logtool, pathlib2
 statsd==3.2.1
-temporary==1.0.0          # via cfgtool
+temporary==3.0.0          # via cfgtool
 termcolor==1.1.0          # via cfgtool
 wrapt==1.10.8             # via logtool

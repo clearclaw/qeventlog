@@ -4,6 +4,7 @@ celery
 celery_statsd
 cfgtool
 django-model-utils
+django-pgjsonb
 Django
 logtool
 path.py
